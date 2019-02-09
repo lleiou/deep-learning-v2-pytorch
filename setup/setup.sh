@@ -1,0 +1,1 @@
+conda env create -f ./setup/environment.yml

@@ -1,0 +1,17 @@
+name: pytorch
+channels:
+  - defaults
+  - pytorch
+  - conda-forge
+dependencies:
+  - python=3.6
+  - pip==9.0.1
+  - numpy==1.12.1
+  - pandas==0.20.1
+  - matplotlib==2.2.2
+  - pytest
+  - pytorch
+  - scipy
+  - torchvision
+  - pip:
+    - pyyaml==3.12
