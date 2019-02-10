@@ -456,3 +456,10 @@ good learning rates are those that decrease as model is getting closer to soluti
 
 
 
+
+
+
+
+
+links:
+- [Backpropagation | Brilliant](https://brilliant.org/wiki/backpropagation/)
