@@ -154,6 +154,18 @@ print(model.fc1)
 ```
 
 
+9. 
+forward: get the loss
+backward: get the graident and update weights & biases
+
+
+You'll usually see the loss assigned to `criterion`. As noted in the last part, with a classification problem such as MNIST, we're using the softmax function to predict class probabilities. With a softmax output, you want to use cross-entropy as the loss. To actually calculate the loss, you first define the criterion then pass in the output of your network and the correct labels.
+Something really important to note here. Looking at the documentation for nn.CrossEntropyLoss,
+This criterion combines nn.LogSoftmax() and nn.NLLLoss() in one single class.
+
+The input is expected to contain scores for each class.
+This means we need to pass in the raw output of our network into the loss, not the output of the softmax function. This raw output is usually called the logits or scores. We use the logits because softmax gives you probabilities which will often be very close to zero or one but floating-point numbers can't accurately represent values near zero or one (read more [here](https://docs.python.org/3/tutorial/floatingpoint.html)). It's usually best to avoid doing calculations with probabilities, typically we use log-probabilities.
+
 
 
 
@@ -163,3 +175,4 @@ link:
 - [PyTorch Documentations](https://pytorch.org/docs/stable/index.html#pytorch-documentation)
 - [Deep Learning With PyTorch](https://medium.com/@josh_2774/deep-learning-with-pytorch-9574e74d17ad)
 - [PyTorch Basics: Tensors and Gradients](https://medium.com/jovian-io/pytorch-basics-tensors-and-gradients-eb2f6e8a6eee)
+
