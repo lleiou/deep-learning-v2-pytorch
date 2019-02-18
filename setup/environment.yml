@@ -13,5 +13,6 @@ dependencies:
   - pytorch
   - scipy
   - torchvision
+  - nb_conda
   - pip:
     - pyyaml==3.12
