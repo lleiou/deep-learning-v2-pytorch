@@ -231,9 +231,97 @@ print(x.grad)
 calculate the gradients for the parameters:
 `loss.backward()`
 
+we use `optimizer` to upgrade weights and bias using gradient descent. 
+
+When you do multiple backwards passes with the same parameters, the gradients are accumulated. This means that you need to zero the gradients on each training pass or you'll retain gradients from previous training batches:
+```python
+optimizer.zero_grad()
+```
+
+**epoch**: one pass through the entire dataset
+
+one training batch:
+- training pass: calculate the loss, 
+- backwards pass: update the weights.
+
+A general learning step with PyTorch:
+- Make a forward pass through the network 
+- Use the network output to calculate the loss
+- Perform a backward pass through the network with `loss.backward()` to calculate the gradients
+- Take a step with the optimizer to update the weights
+
+put all the ~~thing~~ together and call it a Presidents Day 2019:
+```python
+import torch
+from torch import nn
+import torch.nn.functional as F
+from torchvision import datasets, transforms
+from torch import optim
 
 
-12. 
+# DATA PREPARATION
+## Define a transform to normalize the data
+transform = transforms.Compose([transforms.ToTensor(),
+                                transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+                              ])
+## Download and load the training data
+trainset = datasets.MNIST('~/.pytorch/MNIST_data/', download=True, train=True, transform=transform)
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=64, shuffle=True)
+
+
+# MODEL TRAINING
+## Build a feed-forward network that returns the log-softmax as the output 
+## ... and calculate the loss using the negative log likelihood loss.
+model = nn.Sequential(nn.Linear(784, 128),
+                      nn.ReLU(),
+                      nn.Linear(128, 64),
+                      nn.ReLU(),
+                      nn.Linear(64, 10),
+                      nn.LogSoftmax(dim=1))
+
+criterion = nn.NLLLoss()
+## use Stochastic Gradient Descent as optimizer that updates weights and bias for each iteration
+optimizer = optim.SGD(model.parameters(), lr=0.003)
+
+## train the model for 5 epochs
+epochs = 5
+for e in range(epochs):
+    running_loss = 0
+    for images, labels in trainloader:
+        ## Flatten MNIST images into a 784 long vector
+        images = images.view(images.shape[0], -1)
+        # Clear the gradients, do this because gradients are accumulated
+        optimizer.zero_grad()
+        ## make prediction
+        output = model(images)
+        ## calculate negative log likelihood loss
+        loss = criterion(output, labels)
+        ## use autograd to calculate gradient
+        loss.backward()
+        ## update weights and biases using the gradient calculated
+        optimizer.step()
+        
+        running_loss += loss.item()
+    else:
+        print(f"Training loss: {running_loss/len(trainloader)}")
+        
+
+## CHECK MODEL PREDICTION AFTER TRAINING
+
+%matplotlib inline
+import helper
+
+images, labels = next(iter(trainloader))
+
+img = images[0].view(1, 784)
+# Turn off gradients to speed up this part
+with torch.no_grad():
+    logps = model(img)
+
+# Output of the network are log-probabilities, need to take exponential for probabilities
+ps = torch.exp(logps)
+helper.view_classify(img.view(1, 28, 28), ps)
+```
 
 
 
