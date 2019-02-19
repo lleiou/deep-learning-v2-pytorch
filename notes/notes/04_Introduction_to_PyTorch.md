@@ -167,6 +167,74 @@ The input is expected to contain scores for each class.
 This means we need to pass in the raw output of our network into the loss, not the output of the softmax function. This raw output is usually called the logits or scores. We use the logits because softmax gives you probabilities which will often be very close to zero or one but floating-point numbers can't accurately represent values near zero or one (read more [here](https://docs.python.org/3/tutorial/floatingpoint.html)). It's usually best to avoid doing calculations with probabilities, typically we use log-probabilities.
 
 
+10. 
+
+It's more convenient to build the model with a `log-softmax` output using `nn.LogSoftmax` or `F.log_softmax` (documentation). Then you can get the actual probabilities by taking the exponential `torch.exp(output)`. With a `log-softmax` output, you want to use the negative log likelihood loss, `nn.NLLLoss` (documentation).
+```python
+ TODO: Build a feed-forward network
+model = nn.Sequential(nn.Linear(784, 128),
+                      nn.ReLU(),
+                      nn.Linear(128, 64),
+                      nn.ReLU(),
+                      nn.Linear(64, 10),
+                      nn.LogSoftmax(dim=1)
+                     )
+
+# TODO: Define the loss
+criterion = nn.NLLLoss()
+
+### Run this to check your work
+# Get our data
+images, labels = next(iter(trainloader))
+# Flatten images
+images = images.view(images.shape[0], -1)
+
+# Forward pass, get our logits
+logits = model(images)
+# Calculate the loss with the logits and the labels
+loss = criterion(logits, labels)
+
+print(loss)
+```
+to sum up:
+output of the model is log of softmax
+<= softmax is the "propability" of each class predicted by the model
+=> then use Negative Log Likelihood Loss function to calculate loss function.
+
+
+### Autograd
+Autograd works by keeping track of operations performed on tensors, then going backwards through those operations, calculating gradients along the way. To make sure PyTorch keeps track of operations on a tensor and calculates the gradients, you need to set `requires_grad = True` on a tensor. You can do this at creation with the `requires_grad` keyword, or at any time with `x.requires_grad_(True)`:
+
+```python
+x = torch.randn(2,2, requires_grad=True)
+```
+
+you can turn on or off gradients altogether with `torch.set_grad_enabled(True|False)`.
+
+```python
+# initialize a tensor
+x = torch.randn(2,2, requires_grad=True)
+y = x**2
+z = y.mean()
+
+## grad_fn shows the function that generated this variable
+print(y.grad_fn) # power
+print(z.grad_fn) # mean
+
+# calculate gradient of z with respect to x
+z.backward()
+
+# check gradient for x
+print(x.grad)
+```
+
+calculate the gradients for the parameters:
+`loss.backward()`
+
+
+
+12. 
+
 
 
 
