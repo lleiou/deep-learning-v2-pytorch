@@ -244,7 +244,7 @@ one training batch:
 - training pass: calculate the loss, 
 - backwards pass: update the weights.
 
-A general learning step with PyTorch:
+🌟 A general learning step with PyTorch:
 - Make a forward pass through the network 
 - Use the network output to calculate the loss
 - Perform a backward pass through the network with `loss.backward()` to calculate the gradients
@@ -322,6 +322,8 @@ with torch.no_grad():
 ps = torch.exp(logps)
 helper.view_classify(img.view(1, 28, 28), ps)
 ```
+
+to sum up:
 
 
 
