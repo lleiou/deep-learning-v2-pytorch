@@ -239,6 +239,7 @@ optimizer.zero_grad()
 ```
 
 **epoch**: one pass through the entire dataset
+(注意是 entire dataset, 而不是data set的一部分走个来回. 教程中是对 trainloader 里面的 images 进行循环的, 每次循环就对64个图像做一次 feed forward 和 back propagation, 更新一下 model 的 weight 和 bias, 但是这不算一个 epoch, 因为整个 data set 还没有遍历完, 下次循环就要开始对接下来 64 个图像 (这里的 images 是 batch 形式的) 再来一次一样的, 再更新模型, 直到所有 images 都跑了一遍, 才算一个 epoch)
 
 one training batch:
 - training pass: calculate the loss, 
@@ -324,6 +325,14 @@ helper.view_classify(img.view(1, 28, 28), ps)
 ```
 
 to sum up:
+
+
+
+14.
+Performance metrics:
+- accuracy, the percentage of classes the network predicted correctly
+- [Precision and recall](https://en.wikipedia.org/wiki/Precision_and_recall#Definition_(classification_context))
+- top-5 error rate
 
 
 
