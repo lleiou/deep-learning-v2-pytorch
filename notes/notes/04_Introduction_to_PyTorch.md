@@ -386,6 +386,62 @@ would be better to read
 
 
 
+18. loading image data
+
+### Create ImageFolder
+in the image directory, each class has it's own directory. The images are then labeled with the class taken from the directory name. 
+```python
+from torchvision import datasets, transforms
+dataset = datasets.ImageFolder('path/to/data', transform=transform)
+```
+
+### Transforms
+[transform](http://pytorch.org/docs/master/torchvision/transforms.html) is a list of processing steps built with the transforms module from `torchvision`.  the images are different sizes but we'll need them to all be the same size for training. Typically you'll combine these transforms into a pipeline with `transforms.Compose()`, which accepts a list of transforms and runs them in sequence. It looks something like this to scale, then crop, then convert to a tensor:
+```python
+transform = transforms.Compose([transforms.Resize(255),
+                                 transforms.CenterCrop(224),
+                                 transforms.ToTensor()])
+```
+
+### Data Loaders
+With the ImageFolder loaded, you have to pass it to a DataLoader. The DataLoader takes a dataset (such as you would get from ImageFolder) and returns batches of images and the corresponding labels. You can set various parameters like the batch size and if the data is shuffled after each epoch. 
+也就是给每个图像配上 label 并打乱顺序, 为 train model 做好准备
+
+```python
+dataloader = torch.utils.data.DataLoader(dataset, batch_size=32, shuffle=True)
+# shuffle=True prevents you from learning through the same order each time
+```
+
+Here `dataloader` is a [generator](https://jeffknupp.com/blog/2013/04/07/improve-your-python-yield-and-generators-explained/). To get data out of it, you need to loop through it or convert it to an iterator and call `next()`.
+
+```python
+# Looping through it, get a batch on each loop 
+for images, labels in dataloader:
+    pass
+
+# Get one batch
+images, labels = next(iter(dataloader))
+
+# show picture
+import helper
+helper.imshow(images[0], normalize=False)
+```
+
+
+### Data Augmentation
+introduce randomness in the input data itself: rotate, mirror, scale, and/or crop.
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 link: 
