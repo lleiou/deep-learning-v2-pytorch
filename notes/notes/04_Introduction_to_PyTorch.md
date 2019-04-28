@@ -13,7 +13,7 @@ conda install jupyter
 Now, open jupyter notebook and run `import torch` .
 
 
-above doesn't really work, what really work is creating a conda environment, please refer to `setup/environment.yml`, when you use it for the first time, create virtual environment first by running `bash ./setup/setup.sh` from the roor folder. in the future, activate `pytorch` virtual environment every time you need to work on the projects in this course.
+above doesn't really work, what really work is creating a conda environment, please refer to `setup/environment.yml`, when you use it for the first time, create virtual environment first by running `bash ./setup/setup.sh` from the root folder. in the future, activate `pytorch` virtual environment every time you need to work on the projects in this course.
 
 2. single layer neural networks
 [`torch.sum()`](https://pytorch.org/docs/stable/torch.html#torch.sum): returns sum of all elements in a tensor
@@ -55,7 +55,7 @@ quickly flatten a tensor without having to know what the 2nd dimension has to be
 ```python
 inputs = image.view(image.shape[0], -1)
 ```
-when implementing softmax, make sure you each row is devided by the corrsponding sum, which means you have to reshape the denominator:
+when implementing softmax, make sure each row is devided by the corrsponding sum, which means you have to reshape the denominator:
 ```python
 def softmax(x):
     return torch.exp(x)/torch.sum(torch.exp(x), dim=1).view(-1, 1)
@@ -333,6 +333,11 @@ Performance metrics:
 - accuracy, the percentage of classes the network predicted correctly
 - [Precision and recall](https://en.wikipedia.org/wiki/Precision_and_recall#Definition_(classification_context))
 - top-5 error rate
+
+waht is drop out?
+
+
+15. 
 
 
 
