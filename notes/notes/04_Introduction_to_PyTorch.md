@@ -334,10 +334,56 @@ Performance metrics:
 - [Precision and recall](https://en.wikipedia.org/wiki/Precision_and_recall#Definition_(classification_context))
 - top-5 error rate
 
-waht is drop out?
+> The network learns the training set better and better, resulting in lower training losses. However, it starts having problems generalizing to data outside the training set leading to the validation loss increasing. The ultimate goal of any deep learning model is to make predictions on new data, so we should strive to get the lowest validation loss possible. 
 
 
 15. 
+
+
+Two solutions to overfitting:
+- early-stopping: use the version of the model with the lowest validation loss, here the one around 8-10 training epochs. In practice, you'd save the model frequently as you're training then later choose the model with the lowest validation loss.
+- dropout: randomly drop input units. This forces the network to share information between weights, increasing it's ability to generalize *to* new data.
+```python
+    ...        
+        # Dropout module with 0.2 drop probability
+        self.dropout = nn.Dropout(p=0.2)
+        # this is definining a method for the classs using an existing function
+```
+
+During training we want to use dropout to prevent overfitting, but during inference we want to use the entire network. So, **we need to turn off dropout during validation, testing, and whenever we're using the network to make predictions.** 
+
+#### The general pattern for the validation loop
+turn off gradients \
+-> set the model to evaluation mode where the dropout probability is 0 (use `model.eval()`)\
+-> calculate the validation loss and metric \
+-> then set the model back to train mode (use `model.train()`)
+
+
+
+17. saving an loadiNG models
+The parameters for PyTorch networks are stored in a model's state_dict. We can see the state dict contains the weight and bias matrices for each of our layers.
+```python
+print("Our model: \n\n", model, '\n')
+print("The state dict keys: \n\n", model.state_dict().keys())
+
+# save state dict
+torch.save(model.state_dict(), 'checkpoint.pth')
+
+# load state dict
+model.load_state_dict(state_dict)
+```
+Loading the state dict works only if the model architecture is exactly the same as the checkpoint architecture. If I create a model with a different architecture, this fails. This means we need to rebuild the model exactly as it was when trained. Information about the model architecture needs to be saved in the checkpoint, along with the state dict. To do this, you build a dictionary with all the information you need to compeletely rebuild the model.
+
+
+# I DON'T GET IT, WHAT'S THE POINT OF REBUILDING THE MODEL HERE?
+# THERE COULD BE SOME CONFUSION IN THE LAST 4 CELLS
+https://github.com/udacity/deep-learning-v2-pytorch/issues/84
+
+
+would be better to read 
+
+[SAVING AND LOADING MODELS | PyTorch](https://pytorch.org/tutorials/beginner/saving_loading_models.html)
+
 
 
 
