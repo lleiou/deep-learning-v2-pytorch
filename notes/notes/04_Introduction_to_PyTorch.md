@@ -431,6 +431,22 @@ helper.imshow(images[0], normalize=False)
 ### Data Augmentation
 introduce randomness in the input data itself: rotate, mirror, scale, and/or crop.
 
+```python
+train_transforms = transforms.Compose([transforms.RandomRotation(30),
+                                       transforms.RandomResizedCrop(224),
+                                       transforms.RandomHorizontalFlip(),
+                                       transforms.ToTensor(),
+                                       transforms.Normalize([0.5, 0.5, 0.5], 
+                                                            [0.5, 0.5, 0.5])])
+```
+
+You'll also typically want to normalize images with `transforms.Normalize`. You pass in a list of means and list of standard deviations, then the color channels are normalized like so
+
+```input[channel] = (input[channel] - mean[channel]) / std[channel]```
+
+Normalizing helps keep the network work weights near zero which in turn makes backpropagation more stable. **Without normalization, networks will tend to fail to learn.**
+
+You can find a list of all [the available transforms here](http://pytorch.org/docs/0.3.0/torchvision/transforms.html). When you're testing however, you'll want to use images that aren't altered (except you'll need to normalize the same way). So, for validation/test images, you'll typically just resize and crop.
 
 
 
