@@ -446,11 +446,25 @@ You'll also typically want to normalize images with `transforms.Normalize`. You 
 
 Normalizing helps keep the network work weights near zero which in turn makes backpropagation more stable. **Without normalization, networks will tend to fail to learn.**
 
-You can find a list of all [the available transforms here](http://pytorch.org/docs/0.3.0/torchvision/transforms.html). When you're testing however, you'll want to use images that aren't altered (except you'll need to normalize the same way). So, for validation/test images, you'll typically just resize and crop.
+You can find a list of all [the available transforms here](http://pytorch.org/docs/0.3.0/torchvision/transforms.html). When you're testing however, you'll want to use images that aren't altered (except you'll need to normalize the same way). So, for validation/test images, you'll typically just resize and crop. 因为 augmentation 只是
 
 
 
 
+
+22. tips, tricks, and others
+Watch those shapes
+In general, you'll want to check that the tensors going through your model and other code are the correct shapes. Make use of the `.shape` method during debugging and development.
+
+A few things to check if your network isn't training appropriately
+Make sure you're clearing the gradients in the training loop with `optimizer.zero_grad()`. If you're doing a validation loop, be sure to set the network to evaluation mode with `model.eval()`, then back to training mode with `model.train()`.
+
+CUDA errors
+Sometimes you'll see this error:
+```
+RuntimeError: Expected object of type torch.FloatTensor but found type torch.cuda.FloatTensor for argument #1 ‘mat1’
+```
+You'll notice the second type is `torch.cuda.FloatTensor`, this means it's a tensor that has been moved to the GPU. It's expecting a tensor with type `torch.FloatTensor`, no .cuda there, which means the tensor should be on the CPU. **PyTorch can only perform operations on tensors that are on the same device, so either both CPU or both GPU**. If you're trying to run your network on the GPU, check to make sure you've moved the model and all necessary tensors to the GPU with `.to(device)` where `device` is either "cuda" or "cpu".
 
 
 
