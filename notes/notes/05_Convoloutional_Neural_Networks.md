@@ -154,3 +154,78 @@ for epoch in range(n_epochs):
 ```
 
 
+## Test the Trained Network
+
+Finally, we test our best model on previously unseen **test data** and evaluate it's performance. Testing on unseen data is a good way to check that our model generalizes well. It may also be useful to be granular in this analysis and take a look at how this model performs on each class as well as looking at its overall loss and accuracy.
+
+#### `model.eval()`
+
+`model.eval(`) will set all the layers in your model to evaluation mode. This affects layers like dropout layers that turn "off" nodes during training with some probability, but should allow every node to be "on" for evaluation!
+
+```python
+# initialize lists to monitor test loss and accuracy
+test_loss = 0.0
+class_correct = list(0. for i in range(10))
+class_total = list(0. for i in range(10))
+
+model.eval() # prep model for *evaluation*
+
+for data, target in test_loader:
+    # forward pass: compute predicted outputs by passing inputs to the model
+    output = model(data)
+    # calculate the loss
+    loss = criterion(output, target)
+    # update test loss 
+    test_loss += loss.item()*data.size(0)
+    # convert output probabilities to predicted class
+    _, pred = torch.max(output, 1)
+    # compare predictions to true label
+    correct = np.squeeze(pred.eq(target.data.view_as(pred)))
+    # calculate test accuracy for each object class
+    for i in range(batch_size):
+        label = target.data[i]
+        class_correct[label] += correct[i].item()
+        class_total[label] += 1
+
+# calculate and print avg test loss
+test_loss = test_loss/len(test_loader.dataset)
+print('Test Loss: {:.6f}\n'.format(test_loss))
+
+for i in range(10):
+    if class_total[i] > 0:
+        print('Test Accuracy of %5s: %2d%% (%2d/%2d)' % (
+            str(i), 100 * class_correct[i] / class_total[i],
+            np.sum(class_correct[i]), np.sum(class_total[i])))
+    else:
+        print('Test Accuracy of %5s: N/A (no training examples)' % (classes[i]))
+
+print('\nTest Accuracy (Overall): %2d%% (%2d/%2d)' % (
+    100. * np.sum(class_correct) / np.sum(class_total),
+    np.sum(class_correct), np.sum(class_total)))
+```
+
+
+### Visualize Sample Test Results
+
+This cell displays test images and their labels in this format: `predicted (ground-truth)`. The text will be green for accurately classified examples and red for incorrect predictions.
+
+```python
+# obtain one batch of test images
+dataiter = iter(test_loader)
+images, labels = dataiter.next()
+
+# get sample outputs
+output = model(images)
+# convert output probabilities to predicted class
+_, preds = torch.max(output, 1)
+# prep images for display
+images = images.numpy()
+
+# plot the images in the batch, along with predicted and true labels
+fig = plt.figure(figsize=(25, 4))
+for idx in np.arange(20):
+    ax = fig.add_subplot(2, 20/2, idx+1, xticks=[], yticks=[])
+    ax.imshow(np.squeeze(images[idx]), cmap='gray')
+    ax.set_title("{} ({})".format(str(preds[idx].item()), str(labels[idx].item())),
+                 color=("green" if preds[idx]==labels[idx] else "red"))
+```
