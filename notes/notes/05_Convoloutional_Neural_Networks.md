@@ -20,15 +20,15 @@ MLP: Multi Layer Perceptron
 
 
 7.
-![030701.jpg](../screenshots/04/030701.jpg)
+![050701.jpg](../screenshots/05/050701.jpg)
 
 8.
-![030801.jpg](../screenshots/04/030801.jpg)
-![030802.jpg](../screenshots/04/030802.jpg)
-![030803.jpg](../screenshots/04/030803.jpg)
+![050801.jpg](../screenshots/05/050801.jpg)
+![050802.jpg](../screenshots/05/050802.jpg)
+![050803.jpg](../screenshots/05/050803.jpg)
 please refer to lecture 2.22 to understand this error function, basically it is the negative of loss of the prob of the class that the model is actually predicted (which is the definition of cross entropy)
-![030804.jpg](../screenshots/04/030804.jpg)
-![030805.jpg](../screenshots/04/030805.jpg)
+![050804.jpg](../screenshots/05/050804.jpg)
+![050805.jpg](../screenshots/05/050805.jpg)
 
 
 9.
@@ -48,6 +48,7 @@ Then applies NLLLoss; negative log likelihood loss
 11. 
 *please try creating your own deep learning models! Much of the value in this experience will come from experimenting with the code, in your own way.*
 
+The codes below has incorporated validation set mentioned in [lecture 16](https://github.com/lleiou/deep-learning-v2-pytorch/blob/master/convolutional-neural-networks/mnist-mlp/mnist_mlp_solution_with_validation.ipynb).
 
 ### Define the Network Architecture
 ```python
@@ -118,17 +119,20 @@ The following loop trains for 30 epochs; feel free to change this number. For no
 
 ```python
 # number of epochs to train the model
-n_epochs = 30  # suggest training between 20-50 epochs
+n_epochs = 50
 
-model.train() # prep model for training
+# initialize tracker for minimum validation loss
+valid_loss_min = np.Inf # set initial "min" to infinity
 
 for epoch in range(n_epochs):
     # monitor training loss
     train_loss = 0.0
+    valid_loss = 0.0
     
     ###################
     # train the model #
     ###################
+    model.train() # prep model for training
     for data, target in train_loader:
         # clear the gradients of all optimized variables
         optimizer.zero_grad()
@@ -143,14 +147,41 @@ for epoch in range(n_epochs):
         # update running training loss
         train_loss += loss.item()*data.size(0)
         
-    # print training statistics 
+    ######################    
+    # validate the model #
+    ######################
+    model.eval() # prep model for evaluation
+    for data, target in valid_loader:
+        # forward pass: compute predicted outputs by passing inputs to the model
+        output = model(data)
+        # calculate the loss
+        loss = criterion(output, target)
+        # update running validation loss 
+        valid_loss += loss.item()*data.size(0)
+        
+    # print training/validation statistics 
     # calculate average loss over an epoch
     train_loss = train_loss/len(train_loader.dataset)
-
-    print('Epoch: {} \tTraining Loss: {:.6f}'.format(
+    valid_loss = valid_loss/len(valid_loader.dataset)
+    
+    print('Epoch: {} \tTraining Loss: {:.6f} \tValidation Loss: {:.6f}'.format(
         epoch+1, 
-        train_loss
+        train_loss,
+        valid_loss
         ))
+    
+    # save model if validation loss has decreased
+    if valid_loss <= valid_loss_min:
+        print('Validation loss decreased ({:.6f} --> {:.6f}).  Saving model ...'.format(
+        valid_loss_min,
+        valid_loss))
+        torch.save(model.state_dict(), 'model.pt')
+        valid_loss_min = valid_loss
+```
+
+###  Load the Model with the Lowest Validation Loss
+```python
+model.load_state_dict(torch.load('model.pt'))
 ```
 
 
@@ -168,7 +199,7 @@ test_loss = 0.0
 class_correct = list(0. for i in range(10))
 class_total = list(0. for i in range(10))
 
-model.eval() # prep model for *evaluation*
+model.eval() # prep model for evaluation
 
 for data, target in test_loader:
     # forward pass: compute predicted outputs by passing inputs to the model
@@ -204,6 +235,8 @@ print('\nTest Accuracy (Overall): %2d%% (%2d/%2d)' % (
     np.sum(class_correct), np.sum(class_total)))
 ```
 
+# TODO: `np.squeeze()`: 
+
 
 ### Visualize Sample Test Results
 
@@ -229,3 +262,28 @@ for idx in np.arange(20):
     ax.set_title("{} ({})".format(str(preds[idx].item()), str(labels[idx].item())),
                  color=("green" if preds[idx]==labels[idx] else "red"))
 ```
+
+
+
+14. model validation
+![051401.jpg](../screenshots/05/051401.jpg)
+![051402.jpg](../screenshots/05/051402.jpg)
+
+use validation loss to choose between different models:
+![051403.jpg](../screenshots/05/051403.jpg)
+
+#### The reason why we still need a third data set (Test Set) when we already have a validation set:
+when we go to test the model, it looks at data that it has truly never seen before, even though the model doesn't use the validation set to update its weights, our model selection process is based on how the model performes on both the training and validation sets. In the end, the model is biased in favor of the validation set. Thus we need to separate test set of data to truly see how our selected model generalized and performs when given data it really has not seen before.
+
+
+
+15. 
+We create a validation set to
+- Measure how well a model generalizes, during training
+- Tell us when to stop training a model; when the validation loss stops decreasing (and especially when the validation loss starts increasing and the training loss is still decreasing)
+
+
+16. 
+![051601.jpg](../screenshots/05/051601.jpg)
+
+
