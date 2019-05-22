@@ -287,3 +287,45 @@ We create a validation set to
 ![051601.jpg](../screenshots/05/051601.jpg)
 
 
+
+
+18.
+![051801.jpg](../screenshots/05/051801.jpg)
+
+
+
+21.
+frequency in images is a rate of change. 
+
+images change in space, and a high frequency image is one where the intensity changes a lot. And the level of brightness changes quickly from one pixel to the next. A low frequency image may be one that is relatively uniform in brightness or changes very slowly. This is easiest to see in an example.
+
+
+22.
+
+![052201.jpg](../screenshots/05/052201.jpg)
+![052202.jpg](../screenshots/05/052202.jpg)
+
+This filter computes the difference or change between neighbouring pixels, the differences is calculated by subtracing pixel values of one another around a center pixel
+
+If the sum of all numbers in the matrix is greater than 0: brightening the picture, lower than zero: darkening the picture
+
+![052203.jpg](../screenshots/05/052203.jpg)
+![052204.jpg](../screenshots/05/052204.jpg)
+![052205.jpg](../screenshots/05/052205.jpg)
+
+
+*Edge Handling*
+
+Kernel convolution relies on centering a pixel and looking at it's surrounding neighbors. So, what do you do if there are no surrounding pixels like on an image corner or edge? Well, there are a number of ways to process the edges, which are listed below. It’s most common to use padding, cropping, or extension. In extension, the border pixels of an image are copied and extended far enough to result in a filtered image of the same size as the original image.
+
+Extend 
+- The nearest border pixels are conceptually extended as far as necessary to provide values for the convolution. Corner pixels are extended in 90° wedges. Other edge pixels are extended in lines.
+
+Padding 
+- The image is padded with a border of 0's, black pixels.
+
+Crop 
+- Any pixel in the output image which would require values from beyond the edge is skipped. This method can result in the output image being slightly smaller, with the edges having been cropped.
+
+
+
